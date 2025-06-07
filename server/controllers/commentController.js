@@ -34,15 +34,24 @@ export const replyToComment = async (req, res) => {
 
 export const getCommentsByArticle = async (req, res) => {
   try {
+    const userId = req.user?.id;
+
     const comments = await Comment.find({ article: req.params.articleId })
       .populate('author', 'username')
       .sort({ publishedAt: 1 });
 
-    res.json(comments);
+    const response = comments.map(comment => {
+      const plain = comment.toObject();
+      plain.hasLiked = userId ? comment.likedBy.includes(userId) : false;
+      return plain;
+    });
+
+    res.json(response);
   } catch (err) {
     res.status(500).json({ message: 'Erreur récupération', error: err.message });
   }
 };
+
 
 export const updateComment = async (req, res) => {
   const comment = await Comment.findById(req.params.id);

@@ -4,7 +4,8 @@ import {
   getAllArticles,
   getArticleById,
   updateArticle,
-  deleteArticle
+  deleteArticle,
+  toggleLikeArticle
 } from '../controllers/articleController.js';
 
 import { verifyToken } from '../middleware/authMiddleware.js';
@@ -16,5 +17,6 @@ router.get('/', getAllArticles);
 router.get('/:id', getArticleById);
 router.put('/:id', verifyToken, updateArticle);
 router.delete('/:id', verifyToken, deleteArticle);
+router.put('/like/:id', verifyToken, toggleLikeArticle);
 
 export default router;

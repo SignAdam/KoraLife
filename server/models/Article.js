@@ -7,8 +7,16 @@ const articleSchema = new mongoose.Schema({
   publishedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   images: [{ type: String }],
-  likes: { type: Number, default: 0 },
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   shares: { type: Number, default: 0 }
 });
 
+articleSchema.virtual('likes').get(function () {
+  return this.likedBy.length;
+});
+
+articleSchema.set('toJSON', { virtuals: true });
+articleSchema.set('toObject', { virtuals: true });
+
 export default mongoose.model('Article', articleSchema);
+
