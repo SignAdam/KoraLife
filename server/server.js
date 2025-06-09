@@ -13,10 +13,13 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/uploads', express.static('uploads'));
+
 
 connectDB(); // Connexion MongoDB ici
 

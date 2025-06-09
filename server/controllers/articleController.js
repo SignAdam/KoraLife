@@ -2,19 +2,25 @@ import Article from '../models/Article.js';
 
 export const createArticle = async (req, res) => {
   try {
+    const { title, content } = req.body;
+    const images = req.files?.map(file => `/uploads/${file.filename}`) || [];
+    console.log('BODY:', req.body);
+    console.log('FILES:', req.files);
     const article = await Article.create({
-      title: req.body.title,
-      content: req.body.content,
+      title,
+      content,
       author: req.user.id,
-      images: req.body.images || [],
+      images,
       publishedAt: new Date(),
       updatedAt: new Date()
     });
+
     res.status(201).json(article);
   } catch (err) {
-    res.status(500).json({ message: 'Erreur serveur', error: err.message });
+    res.status(500).json({ message: 'Erreur création', error: err.message });
   }
 };
+
 
 export const getAllArticles = async (req, res) => {
   const userId = req.user?.id;
@@ -43,14 +49,15 @@ export const updateArticle = async (req, res) => {
   const article = await Article.findById(req.params.id);
   if (!article) return res.status(404).json({ message: 'Article introuvable' });
 
-  // Autorisation : auteur ou admin
   if (req.user.id !== article.author.toString() && !req.user.isAdmin) {
     return res.status(403).json({ message: 'Action non autorisée' });
   }
 
+  const images = req.files?.map(file => `/uploads/${file.filename}`) || article.images;
+
   article.title = req.body.title || article.title;
   article.content = req.body.content || article.content;
-  article.images = req.body.images || article.images;
+  article.images = images;
   article.updatedAt = new Date();
 
   await article.save();
